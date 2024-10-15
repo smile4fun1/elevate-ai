@@ -1,35 +1,62 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
+import Layout from "./layout"
+import ChatInterface from "./chat-interface"
+import AnalyticsPage from "./analytics-page"
+import Dashboard from "./dashboard"
+import ProjectsPage from "./projects-page"
+import KnowledgeBase from "./knowledge-base"
+import SettingsPage from "./settings-page"
 
-function App() {
-  const [count, setCount] = useState(0)
-
-  return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+const pageVariants = {
+  initial: { opacity: 0, y: 20 },
+  in: { opacity: 1, y: 0 },
+  out: { opacity: 0, y: -20 }
 }
 
-export default App
+const pageTransition = {
+  type: "tween",
+  ease: "anticipate",
+  duration: 0.5
+}
+
+export default function App() {
+  const [currentPage, setCurrentPage] = React.useState("chat")
+
+  const renderPage = () => {
+    switch (currentPage) {
+      case "chat":
+        return <ChatInterface />
+      case "analytics":
+        return <AnalyticsPage />
+      case "dashboard":
+        return <Dashboard />
+      case "projects":
+        return <ProjectsPage />
+      case "knowledge":
+        return <KnowledgeBase />
+      case "settings":
+        return <SettingsPage />
+      default:
+        return <ChatInterface />
+    }
+  }
+
+  return (
+    <Layout onNavigate={setCurrentPage}>
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={currentPage}
+          initial="initial"
+          animate="in"
+          exit="out"
+          variants={pageVariants}
+          transition={pageTransition}
+          className="flex-grow overflow-hidden"
+        >
+          {renderPage()}
+        </motion.div>
+      </AnimatePresence>
+    </Layout>
+  )
+}
